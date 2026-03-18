@@ -24,14 +24,14 @@ echo "=========================================="
 # ============================================================
 # DIRECTORY SETUP
 # ============================================================
-WORK_DIR="/home/jnavarrete/3D_Chromatin/4DN_pipeline"
+WORK_DIR="/YOUR DIRECTORY HERE/"
 PROCESS_DIR="${WORK_DIR}/HiC_processing"
-FASTQ_DIR="/home/jnavarrete/3D_Chromatin/Practice/Fastq.gz"
+FASTQ_DIR="/YOUR DIRECTORY HERE/Fastq.gz"
 ALIGNED_DIR="${PROCESS_DIR}/aligned"
-REFERENCE="/home/jnavarrete/3D_Chromatin/Practice/HiC_processing/references/hg38.fa"
+REFERENCE="/YOUR DIRECTORY HERE/references/hg38.fa"
 
 # Tool paths
-CONDA_BASE="/home/jnavarrete/anaconda3"
+CONDA_BASE="/YOUR DIRECTORY HERE/anaconda3"
 BWA="${CONDA_BASE}/envs/bwa/bin/bwa"
 SAMTOOLS="${CONDA_BASE}/envs/samtools/bin/samtools"
 
