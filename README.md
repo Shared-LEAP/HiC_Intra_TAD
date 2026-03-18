@@ -1,4 +1,4 @@
-# Interactive 4DN Hi-C Pipeline
+# Custom 4DN Hi-C Pipeline
 ## Cardiomyocyte Differentiation Hi-C Analysis
 
 **Author:** Josue Navarrete  
