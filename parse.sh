@@ -24,15 +24,15 @@ echo "=========================================="
 # ============================================================
 # DIRECTORY SETUP
 # ============================================================
-WORK_DIR="/home/jnavarrete/3D_Chromatin/4DN_pipeline"
+WORK_DIR="/YOUR DIRECTORY HERE/4DN_pipeline"
 PROCESS_DIR="${WORK_DIR}/HiC_processing"
 ALIGNED_DIR="${PROCESS_DIR}/aligned"
 PAIRS_DIR="${PROCESS_DIR}/pairs"
-CHROMSIZES="/home/jnavarrete/3D_Chromatin/4DN_pipeline/HiC_processing/references/hg38.chrom.sizes"
+CHROMSIZES="/YOUR DIRECTORY HERE/references/hg38.chrom.sizes"
 
 
 # Tool paths
-CONDA_BASE="/home/jnavarrete/anaconda3"
+CONDA_BASE="/YOUR DIRECTORY HERE/anaconda3"
 
 # CRITICAL: Activate conda environment so pairtools can find samtools/pbgzip
 source ${CONDA_BASE}/etc/profile.d/conda.sh
