@@ -24,14 +24,14 @@ echo "=========================================="
 # ============================================================
 # DIRECTORY SETUP
 # ============================================================
-WORK_DIR="/home/jnavarrete/3D_Chromatin/4DN_pipeline"
+WORK_DIR="/YOUR DIRECTORY HERE/"
 PROCESS_DIR="${WORK_DIR}/HiC_processing"
 PAIRS_DIR="${PROCESS_DIR}/pairs"
 MAPS_DIR="${PROCESS_DIR}/contact_maps"
 CHROMSIZES="${PROCESS_DIR}/references/hg38.chrom.sizes"
 
 # Tool paths
-CONDA_BASE="/home/jnavarrete/anaconda3"
+CONDA_BASE="/YOUR DIRECTORY HERE/anaconda3"
 
 # Activate conda environment
 source ${CONDA_BASE}/etc/profile.d/conda.sh
