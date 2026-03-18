@@ -2,7 +2,7 @@
 ## Cardiomyocyte Differentiation Hi-C Analysis
 
 **Author:** Josue Navarrete  
-**Date:** January 2026  
+**Date:** March 2026  
 **Purpose:** Step-by-step processing of Hi-C paired-end data to generate contact matrices
 
 ---
@@ -25,7 +25,7 @@ This pipeline processes Hi-C data through 5 separate, interactive steps:
 **Sample:** Day 23 ventricular cardiac myocytes  
 **Sequencing:** In situ Hi-C, paired-end Illumina
 
-**Files:**
+**Files:** https://data.4dnucleome.org/experiment-set-replicates/4DNESDVZJW63/#processed-files
 - Replicate 1: 3 pairs (6 FASTQ files)
 - Replicate 2: 2 pairs (4 FASTQ files)
 - **Total:** 10 FASTQ files
@@ -35,12 +35,13 @@ This pipeline processes Hi-C data through 5 separate, interactive steps:
 ## Directory Structure
 
 ```
-/(Your Home Directory)
+/your directory/
 ├── Fastq/                          # Raw FASTQ files (downloaded)
 └── HiC_processing/
     ├── qc/
     │   ├── fastqc_raw/            # QC reports on raw data
     │   └── fastqc_trimmed/        # QC reports on trimmed data
+    ├── trimmed/                    # Trimmed FASTQ files
     ├── aligned/                    # BAM files from BWA
     ├── pairs/                      # Pairs files (.pairs.gz)
     ├── contact_maps/               # Final .mcool matrices
@@ -60,7 +61,7 @@ This pipeline processes Hi-C data through 5 separate, interactive steps:
 
 **Download hg38 reference:**
 ```bash
-cd /(Your Home Directory)/references
+cd /your directory/references/
 
 # Option A: From UCSC
 wget https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
@@ -94,6 +95,11 @@ conda create -n fastqc -c bioconda fastqc
 conda activate fastqc
 which fastqc  # Verify path
 
+# Cutadapt
+conda create -n cutadapt -c bioconda cutadapt
+conda activate cutadapt
+which cutadapt
+
 # BWA
 conda create -n bwa -c bioconda bwa samtools
 conda activate bwa
@@ -112,10 +118,10 @@ which cooler
 
 **Update tool paths in scripts if needed!**
 
-### 3. Verify FASTQ Files
+### 2. Verify FASTQ Files, Download from website
 
 ```bash
-ls -lh /(Your Home Directory)/Fastq/
+ls -lh /your directory/Fastq/
 # Should show all 10 .fastq.gz files
 ```
 
@@ -129,15 +135,10 @@ ls -lh /(Your Home Directory)/Fastq/
 
 **Run:**
 ```bash
-cd /(Your Home Directory)/HiC_processing
+cd /your directory/HiC_processing
 sbatch step1_fastqc.sh
 ```
 
-**Check progress:**
-```bash
-tail -f logs/step1_fastqc_*.log
-squeue -u $USER
-```
 
 **Review results:**
 ```bash
@@ -163,24 +164,6 @@ ls qc/fastqc_raw/*.html
 sbatch step3_align.sh
 ```
 
-**Check progress:**
-```bash
-tail -f logs/step3_align_*.log
-
-# Monitor individual alignments
-ls -lh aligned/*.bam
-```
-
-**Review mapping statistics:**
-```bash
-# Check mapping rates (should be >80%)
-cat logs/alignment/*_flagstat.txt
-
-# Example output:
-# 50000000 + 0 in total (QC-passed reads + QC-failed reads)
-# 45000000 + 0 mapped (90.00% : N/A)
-```
-
 **BWA flags used:**
 - `-S`: Skip mate rescue (Hi-C specific)
 - `-P`: Mark secondary alignments
@@ -198,26 +181,6 @@ cat logs/alignment/*_flagstat.txt
 **Run:**
 ```bash
 sbatch step4_parse_filter.sh
-```
-
-**Check progress:**
-```bash
-tail -f logs/step4_parse_*.log
-
-# Monitor pairs generation
-ls -lh pairs/*.pairs.gz
-```
-
-**Review statistics:**
-```bash
-# Check deduplication stats
-cat pairs/*_dedup_stats.txt
-
-# View first few pairs
-zcat pairs/rep1_pair1.pairs.gz | head -20
-
-# Check merged replicates
-zcat pairs/rep1_merged.pairs.gz | grep -v "^#" | wc -l
 ```
 
 **Processing steps:**
@@ -240,14 +203,6 @@ zcat pairs/rep1_merged.pairs.gz | grep -v "^#" | wc -l
 **Run:**
 ```bash
 sbatch step5_matrices.sh
-```
-
-**Check progress:**
-```bash
-tail -f logs/step5_matrices_*.log
-
-# Monitor matrix creation
-ls -lh contact_maps/*.mcool
 ```
 
 **Review matrices:**
@@ -305,7 +260,8 @@ pairs/rep2_pair2.pairs.gz
 
 **QC Reports:**
 ```
-qc/fastqc_raw/*.html           # QC
+qc/fastqc_raw/*.html           # Pre-trimming QC
+qc/fastqc_trimmed/*.html       # Post-trimming QC
 ```
 
 ---
@@ -319,24 +275,23 @@ qc/fastqc_raw/*.html           # QC
 - [ ] Per-base quality mostly >Q30
 - [ ] Note any adapter contamination
 
-**Step 2 (Alignment):**
+**Step 3 (Alignment):**
 - [ ] Mapping rate >80% for all samples
 - [ ] BAM files are reasonable size
 - [ ] No errors in BWA logs
 
-**Step 3 (Pairs):**
+**Step 4 (Pairs):**
 - [ ] Valid pairs extracted for all samples
 - [ ] Duplicate rate 20-40% (typical for Hi-C)
 - [ ] Merged replicates have millions of pairs
 - [ ] Pairs indexed successfully (.px2 files exist)
 
-**Step 4 (Matrices):**
+**Step 5 (Matrices):**
 - [ ] .mcool files created for both replicates
 - [ ] All resolutions present
 - [ ] ICE normalization applied
 - [ ] File sizes reasonable (several GB each)
 
----
 
 ## Visualization
 
@@ -376,25 +331,6 @@ plt.colorbar(label='log10(contacts + 1)')
 plt.savefig('chr1_heatmap.png', dpi=300)
 ```
 
-### Option 3: Juicebox
-
-**Convert to .hic format (if needed):**
-```bash
-# This requires additional tools not in this pipeline
-# See 4DN documentation for hic file generation
-```
-
----
-
-## Performance Tips
-
-1. **Use fast local storage** for temp directories
-2. **Increase threads** if you have CPUs available
-3. **Use node-local storage** on cluster if available
-4. **Run steps in parallel** for different samples if resources permit
-
----
-
 ## Next Steps After Pipeline
 
 1. **Replicate comparison** - Compare rep1 vs rep2
@@ -425,4 +361,7 @@ For issues with:
 - **Cooler:** https://cooler.readthedocs.io/
 - **Pairtools:** https://pairtools.readthedocs.io/
 
-:P
+---
+
+**Pipeline Version:** 2.0  
+**Last Updated:** March 2026
